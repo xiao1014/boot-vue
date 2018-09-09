@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -55,8 +56,11 @@ public class MyRealm extends AuthorizingRealm {
         User user = userService.findByUserName(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.addRole(user.getRole());
-        Set<String> permission = new HashSet<>(Arrays.asList(user.getPermission().split(",")));
-        simpleAuthorizationInfo.addStringPermissions(permission);
+        String userPermission = user.getPermission();
+        if (StringUtils.hasText(userPermission)) {
+            Set<String> permission = new HashSet<>(Arrays.asList(userPermission.split(",")));
+            simpleAuthorizationInfo.addStringPermissions(permission);
+        }
         return simpleAuthorizationInfo;
     }
 

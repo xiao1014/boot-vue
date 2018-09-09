@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xiao.bootvue.mapper.UserMapper">
+<mapper namespace="com.xiao.core.user.mapper.UserMapper">
     <resultMap id="BaseResultMap" type="com.xiao.core.user.domain.User">
         <id column="user_id" property="userId" jdbcType="INTEGER"/>
         <result column="user_name" property="userName" jdbcType="VARCHAR"/>
@@ -15,6 +15,13 @@
         <include refid="Base_Column_List"/>
         from t_user
         where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="findByUserName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from t_user
+        where user_name = #{username,jdbcType=VARCHAR}
     </select>
 
     <select id="selectAllUser" resultMap="BaseResultMap">
