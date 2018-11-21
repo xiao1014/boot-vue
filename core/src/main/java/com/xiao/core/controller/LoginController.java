@@ -3,6 +3,7 @@ package com.xiao.core.controller;
 import com.xiao.core.common.ResponseBean;
 import com.xiao.core.shiro.exception.UnauthorizedException;
 import com.xiao.core.shiro.utils.JWTUtil;
+import com.xiao.core.shiro.utils.MD5Utils;
 import com.xiao.core.user.domain.User;
 import com.xiao.core.user.service.UserService;
 import org.apache.shiro.SecurityUtils;
@@ -37,11 +38,25 @@ public class LoginController {
     public ResponseBean login(@RequestParam("username") String username,
                               @RequestParam("password") String password) {
         User user = userService.findByUserName(username);
-        if (user.getPassword().equals(password)) {
-            return new ResponseBean(200, "Login success", JWTUtil.sign(username, password));
+        String saltMD5 = MD5Utils.getSaltMD5(password, user.getSalt());
+        if (user.getPassword().equals(saltMD5)) {
+            return new ResponseBean(200, "Login success", JWTUtil.sign(username, saltMD5));
         } else {
             throw new UnauthorizedException();
         }
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseBean logout() {
+        Subject subject = SecurityUtils.getSubject();
+        //注销
+        subject.logout();
+        return new ResponseBean(200, "成功注销！", null);
+    }
+
+    @PostMapping(value = "/auth")
+    public ResponseBean auth() {
+        return new ResponseBean(200, "已登录！", null);
     }
 
     @GetMapping("/article")
