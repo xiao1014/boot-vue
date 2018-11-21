@@ -81,8 +81,7 @@ public class MyRealm extends AuthorizingRealm {
         if (userBean == null) {
             throw new AuthenticationException("User didn't existed!");
         }
-        String saltMD5 = MD5Utils.getSaltMD5(userBean.getPassword(), userBean.getSalt());
-        if (!JWTUtil.verify(token, username, saltMD5)) {
+        if (!JWTUtil.verify(token, username, userBean.getPassword())) {
             throw new AuthenticationException("Username or password error");
         }
 

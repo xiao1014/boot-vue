@@ -4,9 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -26,12 +28,16 @@ public class JWTUtil {
      */
     public static boolean verify(String token, String username, String secret) {
         try {
+            // TODO 校验redis中是否存在此token，不存在让重新登录
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim("username", username)
-                    .build();
+            JWTVerifier verifier = JWT.require(algorithm).build();
             DecodedJWT jwt = verifier.verify(token);
-            return true;
+            String usernameClaim = jwt.getClaim("username").asString();
+            if (username.equals(usernameClaim)) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception exception) {
             return false;
         }

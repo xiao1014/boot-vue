@@ -40,6 +40,7 @@ public class LoginController {
         User user = userService.findByUserName(username);
         String saltMD5 = MD5Utils.getSaltMD5(password, user.getSalt());
         if (user.getPassword().equals(saltMD5)) {
+            // TODO 在redis中存放token，供校验是否登录时token不存在让重新登录使用
             return new ResponseBean(200, "Login success", JWTUtil.sign(username, saltMD5));
         } else {
             throw new UnauthorizedException();
@@ -55,6 +56,7 @@ public class LoginController {
     }
 
     @PostMapping(value = "/auth")
+    @RequiresAuthentication
     public ResponseBean auth() {
         return new ResponseBean(200, "已登录！", null);
     }
